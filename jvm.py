@@ -1,39 +1,52 @@
-import os
 import psutil
-import platform
 
-def suggest_jvm_args():
-    total_ram_gb = round(psutil.virtual_memory().total / (1024 ** 3))
-    cpu_cores = psutil.cpu_count(logical=False)
-    cpu_threads = psutil.cpu_count(logical=True)
-    arch = platform.architecture()[0]
-
-    # Calculate suggested JVM heap size
-    max_heap = f"-Xmx{int(total_ram_gb * 0.5)}G"
-    min_heap = f"-Xms{int(total_ram_gb * 0.5)}G"
-
-    # G1GC Tuning
-    g1_args = [
+def format_jvm_args(max_heap_gb: int) -> str:
+    """
+    Format the JVM arguments string for Minecraft Java launch.
+    """
+    args = [
+        f"-Xmx{max_heap_gb}G",
         "-XX:+UnlockExperimentalVMOptions",
         "-XX:+UseG1GC",
         "-XX:G1NewSizePercent=20",
         "-XX:G1ReservePercent=20",
         "-XX:MaxGCPauseMillis=50",
-        "-XX:G1HeapRegionSize=16M" if total_ram_gb <= 8 else "-XX:G1HeapRegionSize=32M"
+        "-XX:G1HeapRegionSize=32M"
     ]
+    return " ".join(args)
 
-    # JVM options for 64-bit systems
-    if "64" in arch:
-        g1_args.append("-d64")
+def get_suggested_max_heap() -> int:
+    """
+    Suggest max heap size based on system RAM.
+    Use 50% to 75% of available RAM, capped between 1 and 12 GB.
+    """
+    total_ram_gb = psutil.virtual_memory().total / (1024 ** 3)
+    suggested = int(max(1, min(total_ram_gb * 0.75, 12)))
+    return suggested
 
-    print("Suggested JVM Arguments based on your system:")
-    print("--------------------------------------------------")
-    print(min_heap, max_heap, *g1_args)
-    print(f"\n[System Specs Detected]")
-    print(f"RAM: {total_ram_gb} GB")
-    print(f"CPU Cores: {cpu_cores}")
-    print(f"CPU Threads: {cpu_threads}")
-    print(f"Arch: {arch}")
+def main():
+    print("Minecraft JVM Args Generator\n")
+
+    suggested_heap = get_suggested_max_heap()
+    print(f"Detected system RAM: {psutil.virtual_memory().total / (1024**3):.2f} GB")
+    print(f"Suggested max heap size (-Xmx): {suggested_heap}G\n")
+
+    user_input = input(f"Enter max heap size in GB or press Enter to use {suggested_heap}G: ").strip()
+    if user_input:
+        try:
+            heap_size = int(user_input)
+            if heap_size < 1 or heap_size > 16:
+                print("Warning: Recommended heap size between 1 and 16 GB. Using suggested value instead.")
+                heap_size = suggested_heap
+        except ValueError:
+            print("Invalid input, using suggested heap size.")
+            heap_size = suggested_heap
+    else:
+        heap_size = suggested_heap
+
+    jvm_args = format_jvm_args(heap_size)
+    print("\nGenerated JVM arguments:")
+    print(jvm_args)
 
 if __name__ == "__main__":
-    suggest_jvm_args()
+    main()
