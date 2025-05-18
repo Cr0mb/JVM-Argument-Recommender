@@ -1,58 +1,40 @@
-![image](https://github.com/user-attachments/assets/2fce159a-94a7-40ba-bbc3-c0e64e938daf)
+![image](https://github.com/user-attachments/assets/c361c305-927b-43b7-8e4b-b34a997aa288)
 
-
-# JVM Argument Recommender
-
-A lightweight Python script that recommends optimized JVM (Java Virtual Machine) launch arguments based on your system's hardware specs (CPU, RAM, architecture). Ideal for tuning performance for Minecraft servers, Java apps, or any JVM-based workload.
 
 ---
 
-## What It Does
+# Minecraft JVM Arguments Generator
 
-This script analyzes:
-- Your **total RAM**
-- Your **CPU cores and threads**
-- Your **system architecture (32-bit or 64-bit)**
-
-And based on that, it prints a set of recommended JVM arguments, optimized for performance using the G1 Garbage Collector (`G1GC`).
+A simple Python script that suggests optimized JVM arguments for launching Minecraft Java Edition based on your system’s RAM. The generated JVM options aim to improve performance and stability by tuning the Java Garbage Collector (G1GC) settings and memory allocation, following best practices for Minecraft Java launch options.
 
 ---
 
 ## Features
 
-- Detects RAM and suggests appropriate `-Xmx` and `-Xms` heap sizes
-- Enables G1GC tuning options:
-  - `G1NewSizePercent`
-  - `G1ReservePercent`
-  - `MaxGCPauseMillis`
-  - `G1HeapRegionSize`
-- Adds `-d64` if you're on a 64-bit system
-- Outputs detected system specs
+* Automatically detects your system's total RAM
+* Suggests an appropriate max heap size (`-Xmx`) between 1 GB and 12 GB based on available RAM
+* Uses a proven JVM arguments template optimized for Minecraft:
+
+  ```
+  -Xmx{heap}G -XX:+UnlockExperimentalVMOptions -XX:+UseG1GC -XX:G1NewSizePercent=20 -XX:G1ReservePercent=20 -XX:MaxGCPauseMillis=50 -XX:G1HeapRegionSize=32M
+  ```
+* Allows manual override of max heap size
+* Outputs JVM arguments in a ready-to-use format for Minecraft launchers
 
 ---
 
-## Usage
+## Requirements
 
-1. **Clone this repo or download the script:**
-
-```bash
-git clone https://github.com/Cr0mb/JVM-Argument-Recommender.git
-cd JVM-Argument-Recommender
-````
-
-2. **Run the script:**
-
-```bash
-python jvm.py
-```
-
-> Requires Python 3.x and the `psutil` module.
+* Python 3.6 or newer
+* [psutil](https://pypi.org/project/psutil/) Python package
 
 ---
 
 ## Installation
 
-Install dependencies (only `psutil` is needed):
+1. Clone this repository or download the script file `jvm.py`.
+
+2. Install dependencies:
 
 ```bash
 pip install psutil
@@ -60,12 +42,37 @@ pip install psutil
 
 ---
 
-## Recommended For
+## Usage
 
-* Minecraft Server Optimization
-* Java Application Performance Tuning
-* JVM Debugging
-* DevOps/Systems Engineers working with JVM environments
+Run the script:
+
+```bash
+python jvm_args_generator.py
+```
+
+The script will detect your system’s RAM and suggest a max heap size for Minecraft. You can accept the suggestion or enter your preferred heap size in gigabytes.
+
+Example output:
+
+```
+Detected system RAM: 16.00 GB
+Suggested max heap size (-Xmx): 12G
+
+Enter max heap size in GB or press Enter to use 12G: 
+Generated JVM arguments:
+-Xmx12G -XX:+UnlockExperimentalVMOptions -XX:+UseG1GC -XX:G1NewSizePercent=20 -XX:G1ReservePercent=20 -XX:MaxGCPauseMillis=50 -XX:G1HeapRegionSize=32M
+```
+
+Copy the generated JVM arguments and paste them into your Minecraft launcher’s Java Arguments field.
+
+---
+
+## Notes
+
+* The script caps the max heap size suggestion to 12 GB to maintain Minecraft stability.
+* For systems with less than 2 GB RAM, the script will recommend a minimum of 1 GB heap.
+* You can modify the `format_jvm_args()` function in the script to customize JVM arguments if needed.
+* These JVM arguments are optimized for Java 8 and above, and are compatible with Minecraft Java Edition using modern Java versions.
 
 ---
 
