@@ -47,21 +47,10 @@ pip install psutil
 Run the script:
 
 ```bash
-python jvm_args_generator.py
+python jvm.py
 ```
 
 The script will detect your system’s RAM and suggest a max heap size for Minecraft. You can accept the suggestion or enter your preferred heap size in gigabytes.
-
-Example output:
-
-```
-Detected system RAM: 16.00 GB
-Suggested max heap size (-Xmx): 12G
-
-Enter max heap size in GB or press Enter to use 12G: 
-Generated JVM arguments:
--Xmx12G -XX:+UnlockExperimentalVMOptions -XX:+UseG1GC -XX:G1NewSizePercent=20 -XX:G1ReservePercent=20 -XX:MaxGCPauseMillis=50 -XX:G1HeapRegionSize=32M
-```
 
 Copy the generated JVM arguments and paste them into your Minecraft launcher’s Java Arguments field.
 
