@@ -1,3 +1,6 @@
+![image](https://github.com/user-attachments/assets/2fce159a-94a7-40ba-bbc3-c0e64e938daf)
+
+
 # JVM Argument Recommender
 
 A lightweight Python script that recommends optimized JVM (Java Virtual Machine) launch arguments based on your system's hardware specs (CPU, RAM, architecture). Ideal for tuning performance for Minecraft servers, Java apps, or any JVM-based workload.
